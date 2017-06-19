@@ -1,8 +1,0 @@
-.vagrant
-.vagrant/*
-*.gz
-*.tgz
-*.pem
-*.sh
-.DS_Store
-Berksfile.lock
