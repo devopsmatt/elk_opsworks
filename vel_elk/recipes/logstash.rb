@@ -54,7 +54,7 @@ if [ 'dev', 'vagrant'].include?(node.chef_environment)
   end
 else
   get_stack_nodes "get_es_nodes" do
-    layer_id '3a54a88e-d234-4cdf-997b-8aecb0e23e04'
+    layer_id "#{node['vel']['stack']['id']}"
     region   'us-east-1'
     label    'es'
     only_if "test -f /etc/hosts"
