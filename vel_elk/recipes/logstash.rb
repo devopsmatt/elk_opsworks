@@ -25,6 +25,20 @@ bash 'system_tweaks' do
   not_if 'grep -qs "logstash" /etc/security/limits.conf'
 end
 
+directory '/usr/share/logstash/patterns' do
+  owner 'logstash'
+  group 'logstash'
+  mode '0755'
+  recursive true
+  action :create
+end
+
+cookbook_file '/usr/share/logstash/patterns/nginx.pattern' do
+  source 'nginx.pattern'
+  owner 'logstash'
+  group 'logstash'
+  mode '0644'
+end
 
 cookbook_file '/etc/logstash/logstash.yml' do
   source 'logstash.yml'
@@ -54,7 +68,7 @@ if [ 'dev', 'vagrant'].include?(node.chef_environment)
   end
 else
   get_stack_nodes "get_es_nodes" do
-    layer_id '3a54a88e-d234-4cdf-997b-8aecb0e23e04'
+    layer_id "#{node['vel']['stack']['id']}"
     region   'us-east-1'
     label    'es'
     only_if "test -f /etc/hosts"
@@ -72,6 +86,19 @@ end
 
 package 'nginx' do
   action :install
+end
+
+cookbook_file '/etc/nginx/nginx.conf' do
+  source 'nginx.conf'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  notifies :run, "execute[nginx_restart]"
+end
+
+execute 'nginx_restart' do
+  command 'chmod -R  o+r /var/log/nginx/;service nginx restart'
+  action :run
 end
 
 execute 'restart_logstash' do

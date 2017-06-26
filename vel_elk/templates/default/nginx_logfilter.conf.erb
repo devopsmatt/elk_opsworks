@@ -1,6 +1,6 @@
 input {
         file {
-              path => "/var/log/nginx/access.log"
+              path => "/var/log/nginx/*access*"
               type => "web_nginx_access"
               sincedb_path => "/var/tmp/logstash_since"
               start_position => "beginning"
@@ -9,14 +9,15 @@ input {
 
 filter {
         if [type] == "web_nginx_access" {
-                grok {
-                      match => [
-                          "message", "%{IPORHOST:http_host} - %{USERNAME:remote_user} - \[%{HTTPDATE:timestamp}\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion}))\" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent}"
-                      ]
-                }
-                date {
-                      match => [ "timestamp" , "dd/MMM/YYYY:HH:mm:ss Z" ]
-                }
+            grok {
+              match => { "message" => "%{NGINXACCESS}" }
+            }
+            date {
+              match => [ "timestamp" , "dd/MMM/YYYY:HH:mm:ss Z" ]
+            }
+            geoip {
+              source => "clientip"
+            }
         }
 }
 

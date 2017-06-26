@@ -25,7 +25,7 @@ bash 'install_java' do
 end
 
 
-
+include_recipe "#{cookbook_name}::base"
 include_recipe "#{cookbook_name}::es"
 include_recipe "#{cookbook_name}::logstash"
 include_recipe "#{cookbook_name}::kibana"
